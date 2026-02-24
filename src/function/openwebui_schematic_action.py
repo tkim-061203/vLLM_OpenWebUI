@@ -47,6 +47,14 @@ class Action:
         """
         Action button to generate schematic using Yosys.
         """
+        # Show waiting status immediately
+        await __event_emitter__(
+            {
+                "type": "status",
+                "data": {"description": "⏳ Waiting... Generating schematic", "done": False},
+            }
+        )
+        
         messages = body.get("messages", [])
         if not messages:
             await __event_emitter__(

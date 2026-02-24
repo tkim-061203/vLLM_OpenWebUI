@@ -31,7 +31,7 @@ vllm serve deepseek-ai/deepseek-coder-6.7b-instruct \
 open-webui serve
 ```
 
-Access at: **http://localhost:8080**
+Access at: **[http://localhost:8080](http://localhost:8080)**
 
 **Default Admin Credentials:**
 
@@ -40,7 +40,7 @@ Access at: **http://localhost:8080**
 
 ## Project Structure
 
-```
+```text
 vLLM_OpenWebUI/
 ├── src/
 │   └── function/           # Custom Open WebUI functions
@@ -163,9 +163,16 @@ This documentation covers:
 
 This project's Verilog tools are inspired by the safe code execution pattern used in Open WebUI. The concept enables LLMs to execute code securely through sandboxed environments.
 
-
 ## Notes
 
 - Ensure vLLM server is running before starting Open WebUI
 - The model will be available at the OpenAI-compatible endpoint
 - Custom functions must be uploaded through Open WebUI's admin panel
+
+## Future Development
+
+For planned features based on research papers (COMBA-PROMPT & REFINE-Verilog), see:
+
+**[README_FutureWork.md](README_FutureWork.md)**
+
+[fuction](res/functions.png)

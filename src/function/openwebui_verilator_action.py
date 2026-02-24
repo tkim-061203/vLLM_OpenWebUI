@@ -38,6 +38,14 @@ class Action:
         """
         Action button to check Verilog syntax in the last assistant message.
         """
+        # Show waiting status immediately
+        await __event_emitter__(
+            {
+                "type": "status",
+                "data": {"description": "⏳ Waiting... Checking syntax", "done": False},
+            }
+        )
+        
         messages = body.get("messages", [])
         if not messages:
             await __event_emitter__(

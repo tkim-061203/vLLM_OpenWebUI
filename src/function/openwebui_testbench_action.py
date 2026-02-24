@@ -55,6 +55,14 @@ class Action:
         """
         Action button to generate testbench and run simulation for the last Verilog code.
         """
+        # Show waiting status immediately
+        await __event_emitter__(
+            {
+                "type": "status",
+                "data": {"description": "⏳ Waiting... Preparing testbench", "done": False},
+            }
+        )
+        
         messages = body.get("messages", [])
         if not messages:
             await __event_emitter__(
