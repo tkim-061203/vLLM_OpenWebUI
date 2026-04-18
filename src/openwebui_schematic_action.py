@@ -21,7 +21,7 @@ class Action:
             description="Path to yosys executable"
         )
         temp_dir: str = Field(
-            default="/home/nntkim/Chatbox/pyverilator/temp",
+            default="/home/nntkim/vLLM_OpenWebUI/temp",
             description="Directory for temporary files"
         )
         timeout: int = Field(
@@ -73,9 +73,14 @@ class Action:
                 content = msg.get("content", "")
                 codes = self._extract_verilog_blocks(content)
                 if codes:
-                    verilog_code = codes[0]
-                    module_name = self._extract_module_name(verilog_code)
-                    break
+                    for code in codes:
+                        m_name = self._extract_module_name(code)
+                        if m_name and not (m_name.lower().startswith("tb_") or m_name.lower().startswith("test_")):
+                            verilog_code = code
+                            module_name = m_name
+                            break
+                    if verilog_code:
+                        break
 
         if not verilog_code or not module_name:
             await __event_emitter__(

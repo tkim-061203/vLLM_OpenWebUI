@@ -25,7 +25,7 @@ class Action:
             description="Path to vvp simulator executable"
         )
         temp_dir: str = Field(
-            default="/home/nntkim/Chatbox/pyverilator/temp",
+            default="/home/nntkim/vLLM_OpenWebUI/temp",
             description="Directory to save temporary Verilog files"
         )
         timeout: int = Field(

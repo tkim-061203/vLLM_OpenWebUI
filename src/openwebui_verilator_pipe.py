@@ -22,7 +22,7 @@ class Pipe:
             description="Path to verilator executable"
         )
         temp_dir: str = Field(
-            default="/home/nntkim/Chatbox/pyverilator/temp",
+            default="/home/nntkim/vLLM_OpenWebUI/temp",
             description="Directory to save temporary Verilog files"
         )
         llm_api_url: str = Field(
@@ -81,6 +81,11 @@ class Pipe:
         
         for i, code in enumerate(code_blocks):
             module_name = self._extract_module_name(code) or f"block_{i+1}"
+            
+            # Skip testbench modules
+            if module_name.lower().startswith("tb_") or module_name.lower().startswith("test_"):
+                continue
+                
             has_error, error_msg = self._check_syntax(code, module_name)
             if has_error:
                 all_passed = False

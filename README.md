@@ -5,7 +5,7 @@ Complete guide for using Open WebUI with vLLM and custom Verilog development too
 ## 1. Activate Conda Environment
 
 ```bash
-conda activate open-webui
+conda activate openwebui
 ```
 
 ## 2. Start vLLM Server
@@ -43,11 +43,11 @@ Access at: **[http://localhost:8080](http://localhost:8080)**
 ```text
 vLLM_OpenWebUI/
 ├── src/
-│   └── function/               # Custom Open WebUI functions
-│       ├── openwebui_verilator_action.py  # Verilog Syntax Checker (Action)
-│       ├── openwebui_verilator_pipe.py    # Verilog Syntax Auto-Fix (Pipe)
-│       ├── openwebui_testbench_action.py  # Testbench Generator (Action)
-│       └── openwebui_schematic_action.py  # Schematic Viewer (Action)
+│   ├── openwebui_verilator_action.py  # Verilog Syntax Checker (Action)
+│   ├── openwebui_verilator_pipe.py    # Verilog Syntax Auto-Fix (Pipe)
+│   ├── openwebui_testbench_action.py  # Testbench Generator (Action)
+│   ├── openwebui_schematic_action.py  # Schematic Viewer (Action)
+│   └── openwebui_logicgates_action.py  # Logic Gate Report (Action)
 ├── README.md                      # This file
 └── ...
 ```
@@ -63,7 +63,7 @@ To use the custom Verilog tools, you need to upload them through Open WebUI's ad
 
 2. **Add New Function**
    - Click the **"+"** button to create a new function
-   - Copy the content from one of the Python files in `src/function/`
+   - Copy the content from one of the Python files in `src/`
    - Paste it into the function editor
 
 3. **Enable the Function**
@@ -93,13 +93,14 @@ This project includes four custom Open WebUI functions (Actions and Pipes) for V
 
 ### 1. Verilog Syntax Auto-Fix (Pipe)
 
-**File:** `src/function/openwebui_verilator_pipe.py`
+**File:** `src/openwebui_verilator_pipe.py`
 
 An intelligent "Pipe" function that automatically monitors conversation flow. If it detects Verilog code with syntax errors, it transparently prompts the LLM to fix the code until it passes Verilator verification.
 
 **Features:**
 - **Automatic & Proactive**: Works in the background without requiring user clicks.
 - **Self-Healing**: Automatically triggers regeneration loop if errors are found.
+- **Testbench Filtering**: Automatically ignores testbench blocks during verification.
 - **Verified Output**: Ensures the code shown in chat is syntactically correct.
 - **Configurable Retries**: Set maximum regeneration attempts (default: 3).
 - **Context Management**: Handles token limits during repair loops.
@@ -110,13 +111,14 @@ An intelligent "Pipe" function that automatically monitors conversation flow. If
 
 ### 2. Verilog Syntax Checker (Action)
 
-**File:** `src/function/openwebui_verilator_action.py`
+**File:** `src/openwebui_verilator_action.py`
 
 Manual action button to validate Verilog code syntax using Verilator's lint-only mode.
 
 **Features:**
 - Extracts Verilog code blocks from assistant messages.
-- Checks syntax for all detected modules.
+- **Testbench Skipping**: Ignores modules starting with `tb_` or `test_`.
+- Checks syntax for all detected hardware modules.
 - Color-coded results (🟢 OK, 🟡 Warnings, 🔴 Errors).
 - Filters out verbose Verilator informational output.
 
@@ -126,7 +128,7 @@ Manual action button to validate Verilog code syntax using Verilator's lint-only
 
 ### 3. Testbench Generator & Simulator (Action)
 
-**File:** `src/function/openwebui_testbench_action.py`
+**File:** `src/openwebui_testbench_action.py`
 
 Generates testbenches using the LLM and runs simulations with Icarus Verilog.
 
@@ -134,7 +136,7 @@ Generates testbenches using the LLM and runs simulations with Icarus Verilog.
 - Extracts Verilog modules and analyzes ports.
 - Uses DeepSeek model to generate comprehensive testbenches.
 - Compiles and simulates using Icarus Verilog (iverilog + vvp).
-- Displays waveform generation commands and simulation logs.
+- Displays simulation results and logs directly in the chat.
 
 **Usage:** Click the "Generate & Run Testbench" action button after receiving Verilog design code.
 
@@ -142,16 +144,33 @@ Generates testbenches using the LLM and runs simulations with Icarus Verilog.
 
 ### 4. Schematic Viewer (Action)
 
-**File:** `src/function/openwebui_schematic_action.py`
+**File:** `src/openwebui_schematic_action.py`
 
 Generates visual gate-level schematics from Verilog code using Yosys.
 
 **Features:**
 - Synthesizes Verilog to gate-level netlist.
-- Generates SVG schematic diagrams using `netlistsvg` or Yosys internal tools.
+- **Smart Filtering**: Skips testbenches and finds the relevant design module for visualization.
+- Generates SVG schematic diagrams using Yosys internal tools.
 - Displays schematics inline in the chat interface.
 
 **Usage:** Click the "Schematic Viewer (Yosys)" action button to visualize Verilog module structure.
+
+---
+
+### 5. Report Logic Gates (Action)
+
+**File:** `src/openwebui_logicgates_action.py`
+
+Provides a detailed report of logic gates and cells used in the design after Yosys synthesis.
+
+**Features:**
+- **Cell Breakdown**: Counts specific logic gates (AND, OR, NOT, etc.).
+- **Summary Metrics**: Reports wire counts, ports, and public bits.
+- **Hardware Profile**: Automatically identifies the main design module and ignores testbenches.
+- **Formatted Table**: Presents data in a clean, readable Markdown table.
+
+**Usage:** Click the "Report Logic Gates (Yosys)" action button to see a hardware resource breakdown.
 
 ## Resources
 

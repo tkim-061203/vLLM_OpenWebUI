@@ -20,7 +20,7 @@ class Action:
             description="Path to verilator executable"
         )
         temp_dir: str = Field(
-            default="/home/nntkim/Chatbox/pyverilator/temp",
+            default="/home/nntkim/vLLM_OpenWebUI/temp",
             description="Directory to save temporary Verilog files"
         )
 
@@ -97,8 +97,22 @@ class Action:
         results = []
         for i, code in enumerate(code_blocks):
             module_name = self._extract_module_name(code) or f"block_{i+1}"
+            
+            # Skip testbench modules
+            if module_name.lower().startswith("tb_") or module_name.lower().startswith("test_"):
+                continue
+                
             result = self._check_code_syntax(code, module_name)
             results.append(result)
+
+        if not results:
+            await __event_emitter__(
+                {
+                    "type": "status",
+                    "data": {"description": "No non-testbench Verilog modules found", "done": True},
+                }
+            )
+            return None
 
         # Emit results as a message
         results_text = "\n\n".join(results)
