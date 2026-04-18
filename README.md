@@ -43,9 +43,12 @@ Access at: **[http://localhost:8080](http://localhost:8080)**
 ```text
 vLLM_OpenWebUI/
 ├── src/
-│   └── function/           # Custom Open WebUI functions
-│       └── openwebui_testbench_action.py  # Verilog syntax checking tool
-├── README.md              # This file
+│   └── function/               # Custom Open WebUI functions
+│       ├── openwebui_verilator_action.py  # Verilog Syntax Checker (Action)
+│       ├── openwebui_verilator_pipe.py    # Verilog Syntax Auto-Fix (Pipe)
+│       ├── openwebui_testbench_action.py  # Testbench Generator (Action)
+│       └── openwebui_schematic_action.py  # Schematic Viewer (Action)
+├── README.md                      # This file
 └── ...
 ```
 
@@ -86,61 +89,69 @@ After uploading `openwebui_verilator_action.py`, configure these valves:
 
 ## Custom Tools
 
-This project includes three custom Open WebUI action functions for Verilog development:
+This project includes four custom Open WebUI functions (Actions and Pipes) for Verilog development:
 
-### 1. Verilog Syntax Checker
+### 1. Verilog Syntax Auto-Fix (Pipe)
 
-**File:** `src/function/openwebui_verilator_action.py`
+**File:** `src/function/openwebui_verilator_pipe.py`
 
-Validates Verilog code syntax using Verilator's lint-only mode.
+An intelligent "Pipe" function that automatically monitors conversation flow. If it detects Verilog code with syntax errors, it transparently prompts the LLM to fix the code until it passes Verilator verification.
 
 **Features:**
+- **Automatic & Proactive**: Works in the background without requiring user clicks.
+- **Self-Healing**: Automatically triggers regeneration loop if errors are found.
+- **Verified Output**: Ensures the code shown in chat is syntactically correct.
+- **Configurable Retries**: Set maximum regeneration attempts (default: 3).
+- **Context Management**: Handles token limits during repair loops.
 
-- Extracts Verilog code blocks from assistant messages
-- Checks syntax for all detected modules
-- Color-coded results (🟢 OK, 🟡 Warnings, 🔴 Errors)
-- Filters out verbose Verilator informational output
-- Configurable Verilator path and temp directory
-
-**Usage:** Click the "Check Verilog Syntax" action button after the model generates Verilog code.
+**Usage**: Enable this function in the Admin Panel. It will automatically intercept and verify Verilog code blocks.
 
 ---
 
-### 2. Testbench Generator & Simulator
+### 2. Verilog Syntax Checker (Action)
+
+**File:** `src/function/openwebui_verilator_action.py`
+
+Manual action button to validate Verilog code syntax using Verilator's lint-only mode.
+
+**Features:**
+- Extracts Verilog code blocks from assistant messages.
+- Checks syntax for all detected modules.
+- Color-coded results (🟢 OK, 🟡 Warnings, 🔴 Errors).
+- Filters out verbose Verilator informational output.
+
+**Usage:** Click the "Check Verilog Syntax" action button below a message containing Verilog code.
+
+---
+
+### 3. Testbench Generator & Simulator (Action)
 
 **File:** `src/function/openwebui_testbench_action.py`
 
-Automatically generates testbenches using the LLM and runs simulations with Icarus Verilog.
+Generates testbenches using the LLM and runs simulations with Icarus Verilog.
 
 **Features:**
-
-- Extracts Verilog modules and analyzes ports
-- Uses DeepSeek model to generate comprehensive testbenches
-- Compiles and simulates using Icarus Verilog (iverilog + vvp)
-- Displays waveform generation commands
-- Configurable LLM endpoint and model selection
-- Timeout protection for long simulations
+- Extracts Verilog modules and analyzes ports.
+- Uses DeepSeek model to generate comprehensive testbenches.
+- Compiles and simulates using Icarus Verilog (iverilog + vvp).
+- Displays waveform generation commands and simulation logs.
 
 **Usage:** Click the "Generate & Run Testbench" action button after receiving Verilog design code.
 
 ---
 
-### 3. Schematic Viewer (Yosys)
+### 4. Schematic Viewer (Action)
 
 **File:** `src/function/openwebui_schematic_action.py`
 
-Generates visual schematics from Verilog code using Yosys synthesis tool.
+Generates visual gate-level schematics from Verilog code using Yosys.
 
 **Features:**
+- Synthesizes Verilog to gate-level netlist.
+- Generates SVG schematic diagrams using `netlistsvg` or Yosys internal tools.
+- Displays schematics inline in the chat interface.
 
-- Synthesizes Verilog to gate-level netlist
-- Generates SVG schematic diagrams
-- Displays schematics inline in chat
-- Optional netlistsvg support for enhanced visuals
-- Configurable Yosys path and rendering options
-- Automatic module detection
-
-**Usage:** Click the "Schematic Viewer (Yosys)" action button to visualize Verilog module structure
+**Usage:** Click the "Schematic Viewer (Yosys)" action button to visualize Verilog module structure.
 
 ## Resources
 
